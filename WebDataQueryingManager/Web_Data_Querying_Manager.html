@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Web Data Querying Manager</title>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+	<style>
+		*{
+			font-family: Verdana;
+			font-weight: normal;
+		}
+
+		html, body {
+			width: 100%;
+			height: 100%;
+			margin-top: 15px;
+			padding: 0;
+		}
+		
+		#wrapper {
+			margin: 0px 30px;
+		}
+		
+		#wrapper2 {
+			margin: 10px;
+			font-size: 14px; 
+			float: left;
+		}
+
+		h1 {
+			font-size: 16px;
+			font-weight: bold;
+		}
+
+		label {
+			font-size: 13px;
+			left: 20px;
+		}
+		
+		#myDiv {
+			margin-top: 10px;
+			font-size: 14px;
+			border-style: solid;
+			border-width: 1px;
+		}
+	
+	</style>
+	<script src="datetimepicker_css.js"></script>
+	<script language="JavaScript" type="text/javascript">
+	
+	//function to read the request type from radio buttons
+	function getRequestType(browser) {
+		switch (browser)
+		{
+			case "getCapabilities":
+				document.getElementById("requestType").innerHTML = browser;
+				break;
+			case "getObservation":
+				document.getElementById("requestType").innerHTML = browser;
+				break;
+			case "describeSensor":
+				document.getElementById("requestType").innerHTML = browser;
+				break;
+		}
+	}
+	
+	// Download a file form a url
+	function saveFile() {
+		//get url from the corresponding DOM element
+		var url = document.getElementById("url").innerHTML;
+		//create file name 
+		//to get the text of the response Format selection options: document.getElementById("format").options.[document.getElementById("format").selectedIndex].text
+		var filename = document.getElementById("node").value + "." + document.getElementById("format").options[document.getElementById("format").selectedIndex].text
+		var xhr = new XMLHttpRequest();
+		xhr.responseType = 'blob';
+		xhr.onload = function() {
+			var a = document.createElement('a');
+			a.href = window.URL.createObjectURL(xhr.response); // xhr.response is a blob
+			a.download = filename; // Set the file name.
+			a.style.display = 'none';
+			document.body.appendChild(a);
+			a.click();
+			delete a;
+		};
+		xhr.open('GET', url);
+		xhr.send();
+	}
+
+	function dataQuery() {
+		var url,offering, obsProperties,servURL
+		var request = document.getElementById("requestType").innerHTML;
+		var responseFormat = "&responseFormat="+document.getElementById("format").value
+		var procedure = "procedure="+document.getElementById("node").value
+		switch (request) {
+			case "getCapabilities":
+				url = "http://quader.igg.tu-berlin.de/istsos/bridgedemoservice?request=getCapabilities&service=SOS&version=1.0.0"
+				break;
+			case "getObservation":
+				//build up the rest standard parts of the request url
+				servURL = "http://quader.igg.tu-berlin.de/istsos/bridgedemoservice?service=SOS&request=GetObservation&version=1.0.0&"
+				var temperature = document.getElementById("temp").value
+				var timeBegin = "&eventTime=" + document.getElementById("startDate").value.substring(0,10) + "T" + document.getElementById("startDate").value.substring(11,18) + "+01"
+				var timeEnd = "/" + document.getElementById("endDate").value.substring(0,10) + "T" + document.getElementById("startDate").value.substring(11,18) + "+01"
+				
+				//detect the sensor for which we need data 
+				var sensor = document.getElementById("node").value
+				//build url path according to different sensor cases
+				if (sensor == "Node_383" || sensor == "Node_384") {
+					offering = "offering=temporary&"
+					obsProperties = "&observedProperty=acceleration-x,acceleration-y,acceleration-z"
+					url = servURL.concat(offering,procedure,obsProperties,temperature,responseFormat,timeBegin,timeEnd)
+				}
+				else if (sensor == "displ_node_574") {
+					offering = "offering=node_574&"
+					obsProperties = "&observedProperty=displacement"
+					if (temperature == ",temperature"){
+						procedure = procedure + ",t_node_574"
+					}
+					url = servURL.concat(offering,procedure,obsProperties,temperature,responseFormat,timeBegin,timeEnd);
+				}
+				else {
+					obsProperties = "&observedProperty=strain"
+					if (sensor.indexOf("node_573") != -1) {
+						offering = "offering=node_573&";
+						if (temperature == ",temperature") {
+							procedure = procedure + ",t_node_573";
+						}
+					}
+					else if (sensor.indexOf("node_574") != -1) {
+						offering = "offering=node_574&";
+						if (temperature == ",temperature") {
+							procedure = procedure + ",t_node_574";
+						}
+					}
+					url = servURL.concat(offering,procedure,obsProperties,temperature,responseFormat,timeBegin,timeEnd);
+				}
+				break;
+			case "describeSensor":
+				//url = "http://quader.igg.tu-berlin.de/istsos/bridgedemoservice?request=describeSensor&service=SOS&version=1.0.0&procedure=Node_383&outputFormat=text/xml%3Bsubtype%3D%22sensorML/1.0.1%22";
+				servURL = "http://quader.igg.tu-berlin.de/istsos/bridgedemoservice?request=describeSensor&service=SOS&version=1.0.0&";
+				var outputFormat =  "&outputFormat=text/xml%3Bsubtype%3D%22sensorML/1.0.1%22";
+				url = servURL.concat(procedure,outputFormat);
+				break;
+		}
+		
+
+		//pass url to html element a
+		document.getElementById("url").innerHTML = url;
+
+		//create an XMLHttpRequest object		
+		var xmlhttp = new XMLHttpRequest();
+
+		//set up the callback function
+		xmlhttp.onreadystatechange = function() {
+			if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
+			//if i want JSON array: var myArr = JSON.parse(xmlhttp.responseText);
+				var xml = xmlhttp.response;
+				var xml_stripped = xml.replace(/\</g,"&lt;")
+				xml_stripped = xml_stripped.replace(/\>/g,"&gt;")
+				document.getElementById("myDiv").innerHTML = xml_stripped;
+				window.open(url, '_blank');
+			}
+			else if (xmlhttp.status == 400) {
+				alert("XML could not be found")
+			}
+		}
+		
+		//*****************************************		
+		//		SEND REQUEST TO SERVER
+		//*****************************************
+		/*Parameters:
+			GET: Request method
+			url: location of file on the server
+			true: asynchronous process
+		*/
+		xmlhttp.open("GET",
+					url,
+					true);
+		//Send request to server
+		xmlhttp.send(null);
+		
+	}
+		
+	</script>
+</head>
+<body>
+	  <div id="wrapper">
+		<h1>Web Data Querying Manager</h1>
+		<br>
+		<br>
+		<label>Service Name:</label> <input type="text" size="14" id="service" value="bridgedemoservice">
+		
+		<label>Sensor:</label> <select name="nodeList" id="node">
+			<option value="Node_383">node 383</option>
+			<option value="Node_384">node 384</option>
+			<option value="strain_node_573">ch. 1 node 573 (strain)</option>
+			<option value="strain2_node_573">ch. 2 node 573 (strain)</option>
+			<option value="strain3_node_573">ch. 3 node 573 (strain)</option>
+			<option value="strain_node_574">ch. 1 node 574 (strain)</option>
+			<option value="strain2_node_574">ch. 2 node 574 (strain)</option>
+			<option value="displ_node_574">ch. 5 node 574 (displ.)</option>
+		</select>
+		
+		<label>Start datetime</label> <input type="text" size="19" id="startDate" onclick="javascript:NewCssCal('startDate','yyyyMMdd','dropdown',true,'24',true)">
+		<label>End datetime</label> <input type="text" size="19" id="endDate" onclick="javascript:NewCssCal('endDate','yyyyMMdd','dropdown',true,'24',true)" >
+		
+
+		<label>Temperature</label> <select name="addTemp" id="temp">
+			<option value="">no</option>
+			<option value=",temperature">yes</option>
+		</select>
+		
+		<br>
+		<label>Format</label> <select name="responceFormat" id="format">
+			<option value="text/plain">csv</option>
+			<option value="text/xml">xml</option>
+			<option value="text/xml;subtype='sensorML/1.0.0'">sensorML</option>
+			<option value="text/x-json">json</option>
+		</select>
+		
+		<br>
+		</br>
+		<div id="wrapper2" style="">
+			<input type="radio" name="requestType" value="getCapabilities" onclick="getRequestType(this.value)">GetCapabilities
+			<br>
+			<input type="radio" name="requestType" value="describeSensor" onclick="getRequestType(this.value)">DescribeSensor
+			<br>
+			<input type="radio" name="requestType" value="getObservation" onclick="getRequestType(this.value)">GetObservation
+		</div>
+		
+		<div id="wrapper2" style="font-size: 14px; float: left;">
+			<button type="button" onclick="dataQuery()">Submit Request</button>
+			<br>
+			<br>
+			<button type="button" onclick="saveFile()">Save Response</button>
+		</div>
+
+		<div style="margin-top: 10px; font-size: 14px; clear: both;">display response:</div>
+		<div id="myDiv"></div>
+		<a id="url" style="display: none"/>
+		<a id="requestType" style="display: none"/>
+		
+	  </div>
+</body>
+</html>	
