@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<sos:InsertObservation
+xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+xsi:schemaLocation="http://schemas.opengis.net/sos/1.0.0/sosAll.xsd"
+xmlns:sos="http://www.opengis.net/sos/1.0"
+xmlns:xlink="http://www.w3.org/1999/xlink"
+xmlns:sa="http://www.opengis.net/sampling/1.0"
+xmlns:swe="http://www.opengis.net/swe/1.0.1"
+xmlns:gml="http://www.opengis.net/gml/3.2"
+xmlns:ogc="http://www.opengis.net/ogc"
+xmlns:om="http://www.opengis.net/om/1.0" service="SOS" version="1.0.0" >
+<sos:AssignedSensorId>d4920e8252118544b6ae5c08207e90d6</sos:AssignedSensorId>
+<om:Observation>
+<om:procedure xlink:href="urn:ogc:def:procedure:x-istsos:1.0:Node383"/>
+<om:samplingTime>
+<gml:TimePeriod>
+<gml:beginPosition>2014-06-13T11:56:48.006750000+0100</gml:beginPosition>
+<gml:endPosition>2014-06-13T12:56:49.506750000+0100</gml:endPosition>
+</gml:TimePeriod>
+</om:samplingTime>
+<om:observedProperty xlink:href="urn:ogc:def:property:x-istsos:1.0:composit" >
+<swe:CompositPhenomenon dimension="5">
+<swe:component xlink:href="urn:ogc:def:parameter:x-istsos:1.0:time:iso8601"/>
+<swe:component xlink:href="urn:ogc:def:property:x-istsos:1.0:accelerationx"/>
+<swe:component xlink:href="urn:ogc:def:property:x-istsos:1.0:accelerationy"/>
+<swe:component xlink:href="urn:ogc:def:property:x-istsos:1.0:accelerationz"/>
+<swe:component xlink:href="urn:ogc:def:property:x-istsos:1.0:air:temperature"/>
+</swe:CompositPhenomenon>
+</om:observedProperty>
+<om:featureOfInterest xlink:href="urn:ogc:object:feature:x-istsos:1.0:station:test"/>
+<om:result>
+<swe:DataArray>
+<swe:elementCount>
+<swe:Count>
+<swe:value>6</swe:value>
+</swe:Count>
+</swe:elementCount>
+<swe:elementType name="SimpleDataArray">
+<swe:DataRecord definition="urn:ogc:def:dataType:x-istsos:1.0:timeSeries">
+<swe:field name="Time">
+<swe:Time definition="urn:ogc:def:parameter:x-istsos:1.0:time:iso8601"/>
+</swe:field>
+<swe:field name="accelerationx">
+<swe:Quantity definition="urn:ogc:def:property:x-istsos:1.0:accelerationx">
+<swe:uom code="G"/>
+</swe:Quantity>
+</swe:field>
+<swe:field name="accelerationy">
+<swe:Quantity definition="urn:ogc:def:property:x-istsos:1.0:accelerationy">
+<swe:uom code="G"/>
+</swe:Quantity>
+</swe:field>
+<swe:field name="accelerationz">
+<swe:Quantity definition="urn:ogc:def:property:x-istsos:1.0:accelerationz">
+<swe:uom code="G"/>
+</swe:Quantity>
+</swe:field>
+<swe:field name="air:temperature">
+<swe:Quantity definition="urn:ogc:def:property:x-istsos:1.0:air:temperature">
+<swe:uom code="Degree"/>
+</swe:Quantity>
+</swe:field>
+</swe:DataRecord>
+</swe:elementType>
+<swe:encoding>
+<swe:TextBlock tokenSeparator="," blockSeparator="@" decimalSeparator="."/>
+</swe:encoding>
+<swe:values>2014-06-13T11:56:48.006750000+0100,0.01443284005,0.01031082869,-0.9397618771,26.1@
+2014-06-13T12:06:48.256750000+0100,0.0226802621,0.01031082869,-0.9437779188,26.2@
+2014-06-13T12:16:48.506750000+0100,0.01030912809,0.01855824888,-0.9236976504,26.3@
+2014-06-13T12:26:48.756750000+0100,0.01855655015,0.01031082869,-0.9196816087,26.4
+</swe:values>
+</swe:DataArray>
+</om:result>
+</om:Observation>
+</sos:InsertObservation>
