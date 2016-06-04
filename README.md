@@ -1,2 +1,3 @@
 # Java-GIS-SHM
-GIS based Structural Health Monitoring for Bridges 
+GIS based Structural Health Monitoring for Bridges:
+The research goal of our team was to develop and implement an automatic data insertion and retrieval tool for istSOS (an OGC Sensor Observation Service server implementation).  The Sensor spatial data has to be taken (from .csv file), transformed and inserting it into the PostgreSQL/PostGIS database in istSOS server. Different data insertion techniques have been tested like OGC Sensor Observation Service, through HTTP Post request or direct data insertion through JDBC. The end product was a Java GUI application and a web data querying tool to retrieve data and visualize it into the web browser. 
